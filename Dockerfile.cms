@@ -1,0 +1,18 @@
+FROM node:20.11.1-alpine
+RUN apk update
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+RUN pnpm install --global turbo@1.12.4
+
+COPY . .
+
+RUN turbo prune cms-v2 --docker
+
+RUN pnpm install --frozen-lockfile --filter=cms-v2
+
+CMD pnpm start --filter=cms-v2
